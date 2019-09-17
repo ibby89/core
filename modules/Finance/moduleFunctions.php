@@ -159,6 +159,11 @@ function setPaymentLog($connection2, $guid, $foreignTable, $foreignTableID, $typ
     if (isset($_SESSION[$guid]['gibbonPersonID'])) {
         $gibbonPersonID = $_SESSION[$guid]['gibbonPersonID'];
     }
+    if($status == "Awaiting"){
+        $gibbonPersonID = $paymentPayerID;
+        $paymentPayerID = null;
+    }
+
     try {
         $data = array('foreignTable' => $foreignTable, 'foreignTableID' => $foreignTableID, 'gibbonPersonID' => $gibbonPersonID, 'type' => $type, 'status' => $status, 'amount' => $amount, 'gateway' => $gateway, 'onlineTransactionStatus' => $onlineTransactionStatus, 'paymentToken' => $paymentToken, 'paymentPayerID' => $paymentPayerID, 'paymentTransactionID' => $paymentTransactionID, 'paymentReceiptID' => $paymentReceiptID, 'timestamp' => $timestamp);
         $sql = 'INSERT INTO gibbonPayment SET foreignTable=:foreignTable, foreignTableID=:foreignTableID, gibbonPersonID=:gibbonPersonID, type=:type, status=:status, amount=:amount, gateway=:gateway, onlineTransactionStatus=:onlineTransactionStatus, paymentToken=:paymentToken, paymentPayerID=:paymentPayerID, paymentTransactionID=:paymentTransactionID, paymentReceiptID=:paymentReceiptID, timestamp=:timestamp';

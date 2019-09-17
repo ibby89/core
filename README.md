@@ -6,36 +6,21 @@
 
 ------
 
-Gibbon Core
+GoCardless Integration
 ===========
-The Core repository represents the bulk of Gibbon, including all of its primary functionality. The core can be extended through the use of modules and themes, which are provided separately. See the [Extend](https://gibbonedu.org/extend/) page for more info.
+This repository fork contains core changes for the addition of the GoCardless payment gateway solution to the Finance module of Gibbonedu.
 
-Gibbon is open source, and maintained for the benefit of teachers, students, parents and schools.
+## SQL Changes
 
-## Documentation
+After replacing files, please run the following SQL queries:
 
-For full documentation, visit [docs.gibbonedu.org](https://docs.gibbonedu.org/).
+ALTER TABLE `gibbonPayment` CHANGE `status` `status` ENUM('Complete','Partial','Final','Failure','Awaiting') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Complete' COMMENT 'Complete means paid in one go, partial is part of a set of payments, and final is last in a set of payments.'; 
 
-## Installation & Support
+ALTER TABLE `gibbonPayment` CHANGE `onlineTransactionStatus` `onlineTransactionStatus` ENUM('Success','Failure','Awaiting') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL; 
 
-For installation instructions, visit [Getting Started: Installing Gibbon](https://docs.gibbonedu.org/administrators/getting-started/installing-gibbon/)
+ALTER TABLE `gibbonPayment` CHANGE `gateway` `gateway` ENUM('Paypal','GoCardless') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL; 
 
-For support visit [ask.gibbonedu.org](https://ask.gibbonedu.org/) or see [our documentation](https://docs.gibbonedu.org/).
-
-## Cutting Edge
-If you want to run the latest version of Gibbon, prerelease, you can get the source from our [GitHub repository](https://github.com/GibbonEdu/core). Remember, though, it is not stable, and you may lose data. This is not for the faint of heart.
-
-For installation instructions, visit [Getting Started: Installing Gibbon](https://docs.gibbonedu.org/administrators/getting-started/installing-gibbon/), and make sure to follow the additional instructions for [Cutting Edge Code](https://docs.gibbonedu.org/administrators/getting-started/installing-gibbon/cutting-edge-code/).
-
-## Contributing
-
-We welcome community contribution and aim to ensure Gibbon is an open and friendly environment. Information about contributing, submitting issues, and pull requests can be found in the following docs:
-
-- [**Contributor Guide**](https://github.com/GibbonEdu/core/blob/master/.github/CONTRIBUTING.md) - Learn more about how you can contribute to Gibbon, from code to non-code contributions alike.
-
-- [**Code of Conduct**](https://github.com/GibbonEdu/core/blob/master/.github/CODE_OF_CONDUCT.md) - Our pledge to foster a welcoming community and a positive environment for anyone to participate in.
-
-- [**Developer Workflow**](https://docs.gibbonedu.org/developers/getting-started/developer-workflow/) - If you want to get involved in the development process, check out our workflow and [GitHub repository](https://github.com/GibbonEdu/core). Generally there will be a development branch with the latest code, as per our [Development Road Map](https://docs.gibbonedu.org/developers/getting-started/gibbon-road-map/).
+Additional changes to gibbonSetting TBC.
 
 ## License
 

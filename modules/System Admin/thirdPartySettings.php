@@ -45,7 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $setting = getSettingByScope($connection2, 'System', 'googleOAuth', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $row->addYesNo($setting['name'])->selected($setting['value'])->isRequired();
+        $row->addYesNo($setting['name'])->selected($setting['value'])->required();
 
     $form->toggleVisibilityByClass('googleSettings')->onSelect($setting['name'])->when('Y');
 
@@ -80,12 +80,49 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
         $row->addTextField($setting['name'])->setValue($setting['value']);
 
     // PAYPAL
-    $form->addRow()->addHeading(__('PayPal Payment Gateway'));
+    // $form->addRow()->addHeading(__('PayPal Payment Gateway'));
 
-    $setting = getSettingByScope($connection2, 'System', 'enablePayments', true);
+    // $setting = getSettingByScope($connection2, 'System', 'enablePayments', true);
+    // $row = $form->addRow();
+    //     $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+    //     $row->addYesNo($setting['name'])->selected($setting['value'])->required();
+
+    // $form->toggleVisibilityByClass('paypalSettings')->onSelect($setting['name'])->when('Y');
+
+    // $setting = getSettingByScope($connection2, 'System', 'paypalAPIUsername', true);
+    // $row = $form->addRow()->addClass('paypalSettings');
+    //     $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+    //     $row->addTextField($setting['name'])->setValue($setting['value']);
+
+    // $setting = getSettingByScope($connection2, 'System', 'paypalAPIPassword', true);
+    // $row = $form->addRow()->addClass('paypalSettings');
+    //     $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+    //     $row->addTextField($setting['name'])->setValue($setting['value']);
+
+    // $setting = getSettingByScope($connection2, 'System', 'paypalAPISignature', true);
+    // $row = $form->addRow()->addClass('paypalSettings');
+    //     $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+    //     $row->addTextField($setting['name'])->setValue($setting['value']);
+
+    // Omnipay Gateway
+    $form->addRow()->addHeading(__('Payment Gateway Settings'))->append(__('Gibbon can use a number of different gateways to process payments. These are services not affiliated with Gibbon, and you must create your own account with them before being able to send out invoices and process payments using the Finance module.'));
+
+    // Payment Gateway Options - these are not translated, as they represent company names
+    $smsGateways = ['PayPal', 'GoCardless'];
+    $settingP = getSettingByScope($connection2, 'System', 'paymentGatewaySettings', true);
     $row = $form->addRow();
+        $row->addLabel($settingP['name'], __($settingP['nameDisplay']))->description(__($settingP['description']));
+        $row->addSelect($settingP['name'])
+            ->fromArray(['' => __('No')])
+            ->fromArray($smsGateways)
+            ->selected($settingP['value']);
+    
+    // Paypal settings
+    $form->toggleVisibilityByClass('paypalSettingsSelectBox')->onSelect($settingP['name'])->when('PayPal');
+    $setting = getSettingByScope($connection2, 'System', 'enablePayments', true);
+    $row = $form->addRow()->addClass('paypalSettingsSelectBox');;
         $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $row->addYesNo($setting['name'])->selected($setting['value'])->isRequired();
+        $row->addYesNo($setting['name'])->selected($setting['value'])->required();
 
     $form->toggleVisibilityByClass('paypalSettings')->onSelect($setting['name'])->when('Y');
 
@@ -102,7 +139,23 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $setting = getSettingByScope($connection2, 'System', 'paypalAPISignature', true);
     $row = $form->addRow()->addClass('paypalSettings');
         $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addTextField($setting['name'])->setValue($setting['value']);        
+    
+    // GoCardless Settings
+    $form->toggleVisibilityByClass('GoCardlessSettingsSelectBox')->onSelect($settingP['name'])->when('GoCardless');
+    $setting = getSettingByScope($connection2, 'System', 'enableGoCardLess', true);
+    $row = $form->addRow()->addClass('GoCardlessSettingsSelectBox');
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addYesNo($setting['name'])->selected($setting['value'])->required();
+
+    $form->toggleVisibilityByClass('GoCardlessSettings')->onSelect($setting['name'])->when('Y');
+
+    $setting = getSettingByScope($connection2, 'System', 'GoCardlessAPIkey', true);
+    $row = $form->addRow()->addClass('GoCardlessSettings');
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
         $row->addTextField($setting['name'])->setValue($setting['value']);
+
+            
 
     // SMS
     $form->addRow()->addHeading(__('SMS Settings'))->append(__('Gibbon can use a number of different gateways to send out SMS messages. These are paid services, not affiliated with Gibbon, and you must create your own account with them before being able to send out SMSs using the Messenger module.'));
@@ -169,7 +222,7 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $setting = getSettingByScope($connection2, 'System', 'enableMailerSMTP', true);
     $row = $form->addRow();
         $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
-        $row->addYesNo($setting['name'])->selected($setting['value'])->isRequired();
+        $row->addYesNo($setting['name'])->selected($setting['value'])->required();
 
     $form->toggleVisibilityByClass('smtpSettings')->onSelect($setting['name'])->when('Y');
 
@@ -182,6 +235,17 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $row = $form->addRow()->addClass('smtpSettings');
         $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
         $row->addTextField($setting['name'])->setValue($setting['value']);
+
+    $encryptionOptions = [
+        'auto' => __('Automatic'),
+        'tls'  => 'TLS',
+        'ssl'  => 'SSL',
+        'none' => __('None'),
+    ];
+    $setting = getSettingByScope($connection2, 'System', 'mailerSMTPSecure', true);
+    $row = $form->addRow()->addClass('smtpSettings');
+        $row->addLabel($setting['name'], __($setting['nameDisplay']))->description(__($setting['description']));
+        $row->addSelect($setting['name'])->fromArray($encryptionOptions)->selected($setting['value']);
 
     $setting = getSettingByScope($connection2, 'System', 'mailerSMTPUsername', true);
     $row = $form->addRow()->addClass('smtpSettings');

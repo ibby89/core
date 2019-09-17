@@ -25,11 +25,15 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $URL .= '&return=error0';
     header("Location: {$URL}");
 } else {
+    //print_r($_POST); exit;
     //Proceed!
     $enablePayments = (isset($_POST['enablePayments']))? $_POST['enablePayments'] : '';
     $paypalAPIUsername = (isset($_POST['paypalAPIUsername']))? $_POST['paypalAPIUsername'] : '';
     $paypalAPIPassword = (isset($_POST['paypalAPIPassword']))? $_POST['paypalAPIPassword'] : '';
     $paypalAPISignature = (isset($_POST['paypalAPISignature']))? $_POST['paypalAPISignature'] : '';
+    $paymentGatewaySettings = (isset($_POST['paymentGatewaySettings']))? $_POST['paymentGatewaySettings'] : '';
+    $enableGoCardLess = (isset($_POST['enableGoCardLess']))? $_POST['enableGoCardLess'] : '';
+    $goCardlessAPIkey = (isset($_POST['GoCardlessAPIkey']))? $_POST['GoCardlessAPIkey'] : '';    
     $googleOAuth = (isset($_POST['googleOAuth']))? $_POST['googleOAuth'] : '';
     $googleClientName = (isset($_POST['googleClientName']))? $_POST['googleClientName'] : '';
     $googleClientID = (isset($_POST['googleClientID']))? $_POST['googleClientID'] : '';
@@ -48,11 +52,13 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
     $enableMailerSMTP = (isset($_POST['enableMailerSMTP']))? $_POST['enableMailerSMTP'] : '';
     $mailerSMTPHost = (isset($_POST['mailerSMTPHost']))? $_POST['mailerSMTPHost'] : '';
     $mailerSMTPPort = (isset($_POST['mailerSMTPPort']))? $_POST['mailerSMTPPort'] : '';
+    $mailerSMTPSecure = (isset($_POST['mailerSMTPSecure']))? $_POST['mailerSMTPSecure'] : '';
     $mailerSMTPUsername = (isset($_POST['mailerSMTPUsername']))? $_POST['mailerSMTPUsername'] : '';
     $mailerSMTPPassword = (isset($_POST['mailerSMTPPassword']))? $_POST['mailerSMTPPassword'] : '';
 
     //Validate Inputs
-    if ($enablePayments == '' or $googleOAuth == '') {
+    if ($paymentGatewaySettings == '' or $googleOAuth == '') {
+    //if ($enablePayments == '' or $googleOAuth == '') {
         $URL .= '&return=error3';
         header("Location: {$URL}");
     } else {
@@ -124,13 +130,15 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
             }
         }
 
-        try {
-            $data = array('enablePayments' => $enablePayments);
-            $sql = "UPDATE gibbonSetting SET value=:enablePayments WHERE scope='System' AND name='enablePayments'";
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            $fail = true;
+        if($enablePayments != ""){
+            try {
+                $data = array('enablePayments' => $enablePayments);
+                $sql = "UPDATE gibbonSetting SET value=:enablePayments WHERE scope='System' AND name='enablePayments'";
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+            } catch (PDOException $e) {
+                $fail = true;
+            }
         }
 
         if ($enablePayments == 'Y') {
@@ -161,6 +169,42 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
                 $fail = true;
             }
         }
+
+
+        //paymentGatewaySettings for paypal and GoCardless
+        if($paymentGatewaySettings == ""){
+            $paymentGatewaySettings = "No";
+        }
+        try {            
+            $data = array('paymentGatewaySettings' => $paymentGatewaySettings);
+            $sql = "UPDATE gibbonSetting SET value=:paymentGatewaySettings WHERE scope='System' AND name='paymentGatewaySettings'";
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            $fail = true;
+        }
+
+        if($enableGoCardLess != ''){
+            try {
+                $data = array('enableGoCardLess' => $enableGoCardLess);
+                $sql = "UPDATE gibbonSetting SET value=:enableGoCardLess WHERE scope='System' AND name='enableGoCardLess'";
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+            } catch (PDOException $e) {
+                $fail = true;
+            }
+        }
+
+        if($paymentGatewaySettings == "GoCardless" && $enableGoCardLess == "Y"){
+            try {
+                $data = array('GoCardlessAPIkey' => $goCardlessAPIkey);
+                $sql = "UPDATE gibbonSetting SET value=:GoCardlessAPIkey WHERE scope='System' AND name='GoCardlessAPIkey'";
+                $result = $connection2->prepare($sql);
+                $result->execute($data);                
+            } catch (PDOException $e) {
+                $fail = true;
+            }                         
+        }        
 
         try {
             $data = array('value' => $smsGateway);
@@ -241,6 +285,15 @@ if (isActionAccessible($guid, $connection2, '/modules/System Admin/thirdPartySet
             try {
                 $data = array('value' => $mailerSMTPPort);
                 $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='System' AND name='mailerSMTPPort'";
+                $result = $connection2->prepare($sql);
+                $result->execute($data);
+            } catch (PDOException $e) {
+                $fail = true;
+            }
+
+            try {
+                $data = array('value' => $mailerSMTPSecure);
+                $sql = "UPDATE gibbonSetting SET value=:value WHERE scope='System' AND name='mailerSMTPSecure'";
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {
