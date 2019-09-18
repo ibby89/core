@@ -20,7 +20,14 @@ ALTER TABLE `gibbonPayment` CHANGE `onlineTransactionStatus` `onlineTransactionS
 
 ALTER TABLE `gibbonPayment` CHANGE `gateway` `gateway` ENUM('Paypal','GoCardless') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL; 
 
-Additional changes to gibbonSetting TBC.
+INSERT INTO `gibbonSetting` (`gibbonSettingID`, `scope`, `name`, `nameDisplay`, `description`, `value`) VALUES 
+(NULL, 'System', 'paymentGatewaySettings', 'Choose payment gateway', 'Select any payment gateway to make payment through', 'GoCardless') 
+
+INSERT INTO `gibbonSetting` (`gibbonSettingID`, `scope`, `name`, `nameDisplay`, `description`, `value`) VALUES 
+(NULL, 'System', 'enableGoCardLess', 'Enable GoCardless Payments', 'Should payments be enabled across the system?', 'Y')
+
+INSERT INTO `gibbonSetting` (`gibbonSettingID`, `scope`, `name`, `nameDisplay`, `description`, `value`) VALUES 
+(NULL, 'System', 'GoCardlessAPIkey', 'GoCardless API key', 'Set API key for make payment through GoCardless payment gateway ', ' ') 
 
 ## License
 
