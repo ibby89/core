@@ -218,11 +218,12 @@ if ($gibbonFinanceInvoiceID == '' or $key == '' or $paymentType == '') {
                             $URL .= '&return=error2';
                             header("Location: {$URL}");
                             exit();
-                        }
-                        require '../../vendor/autoload.php';
+                        }						
+                        require $_SERVER["DOCUMENT_ROOT"].'/testing/vendor/autoload.php';
                         $client = new \GoCardlessPro\Client([
                             'access_token' => $GoCardlessAPIKey,
-                            'environment' => \GoCardlessPro\Environment::SANDBOX
+                            // For testing with Sandbox accounts only, please see https://github.com/gocardless/gocardless-pro-php
+                            'environment' => \GoCardlessPro\Environment::LIVE
                             ]);
 
                         $rowGibbonCustomer = false;
@@ -308,7 +309,7 @@ if ($gibbonFinanceInvoiceID == '' or $key == '' or $paymentType == '') {
                                         $subscriptionArray['params']['day_of_month'] = "5";
                                     }
 
-                                    // Create Payment flow subscription
+                                    // Create Payment flow subscription									
                                     $paymentFlow = $client->subscriptions()->create($subscriptionArray);
 
                                 }

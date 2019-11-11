@@ -1175,11 +1175,16 @@ function invoiceContents($guid, $connection2, $gibbonFinanceInvoiceID, $gibbonSc
 
         //Online payment
         $enablePayments = getSettingByScope($connection2, 'System', 'enablePayments');
+        $paymentGatewaySettings = getSettingByScope($connection2, 'System', 'paymentGatewaySettings');
+
         $paypalAPIUsername = getSettingByScope($connection2, 'System', 'paypalAPIUsername');
         $paypalAPIPassword = getSettingByScope($connection2, 'System', 'paypalAPIPassword');
         $paypalAPISignature = getSettingByScope($connection2, 'System', 'paypalAPISignature');
 
-        if (!$preview && $enablePayments == 'Y' and $paypalAPIUsername != '' and $paypalAPIPassword != '' and $paypalAPISignature != '' and $row['status'] != 'Paid' and $row['status'] != 'Cancelled' and $row['status'] != 'Refunded') {
+        $enableGoCardLess = getSettingByScope($connection2, 'System', 'enableGoCardLess');
+        $GoCardlessAPIkey = getSettingByScope($connection2, 'System', 'GoCardlessAPIkey');
+
+        if (!$preview && $paymentGatewaySettings == 'PayPal' and $enablePayments == 'Y' and $paypalAPIUsername != '' and $paypalAPIPassword != '' and $paypalAPISignature != '' and $row['status'] != 'Paid' and $row['status'] != 'Cancelled' and $row['status'] != 'Refunded') {
             $financeOnlinePaymentEnabled = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentEnabled');
             $financeOnlinePaymentThreshold = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentThreshold');
             if ($financeOnlinePaymentEnabled == 'Y') {
@@ -1196,6 +1201,24 @@ function invoiceContents($guid, $connection2, $gibbonFinanceInvoiceID, $gibbonSc
                 $return .= '</p>';
             }
         }
+        if (!$preview && $paymentGatewaySettings == 'GoCardless' and $enableGoCardLess == 'Y' and $GoCardlessAPIkey != '' and $row['status'] != 'Paid' and $row['status'] != 'Cancelled' and $row['status'] != 'Refunded') {
+            $financeOnlinePaymentEnabled = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentEnabled');
+            $financeOnlinePaymentThreshold = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentThreshold');
+            if ($financeOnlinePaymentEnabled == 'Y') {
+                $return .= "<h3 style='margin-top: 40px'>";
+                $return .= __('Online Payment');
+                $return .= '</h3>';
+                $return .= '<p>';
+                if ($financeOnlinePaymentThreshold == '' or $financeOnlinePaymentThreshold >= $feeTotal) {
+                    $return .= sprintf(__('Payment can be made with credit/debit card using our secure GoCardless payment gateway. When you press Pay Now, if you have not made a payment to us in the past, you will be directed to GoCardless in order to collect your bank account details. Once the transaction is complete you will be returned to %1$s.'), $_SESSION[$guid]['systemName']).' ';
+                    $return .= "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Finance/invoices_payOnline.php&gibbonFinanceInvoiceID=$gibbonFinanceInvoiceID&key=".$row['key']."'>".__('Pay Now').'.</a>';
+                } else {
+                    $return .= "<div class='warning'>".__('Payment is not permitted for this invoice, as the total amount is greater than the permitted online payment threshold.').'</div>';
+                }
+                $return .= '</p>';
+            }
+        }
+        
 
         //Invoice Notes
         $invoiceNotes = getSettingByScope($connection2, 'Finance', 'invoiceNotes');

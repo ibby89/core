@@ -30,7 +30,7 @@ if (isset($_GET['key'])) {
 }
 
 if (isset($_GET['return'])) {
-    returnProcess($guid, $_GET['return'], null, array('error3' => __("Your payment could not be made as the payment gateway does not support the system's currency."), 'successGC' => __('Your payment has been init successfully from GoCardless. Please wait for confimation from GoCardless.'), 'success1' => __('Your payment has been successfully made to your credit card. A receipt has been emailed to you.'), 'success2' => __('Your payment could not be made to your credit card. Please try an alternative payment method.'), 'success3' => sprintf(__('Your payment has been successfully made to your credit card, but there has been an error recording your payment in %1$s. Please print this screen and contact the school ASAP, quoting code %2$s.'), $_SESSION[$guid]['systemName'], $gibbonFinanceInvoiceID)));
+    returnProcess($guid, $_GET['return'], null, array('error3' => __("Your payment could not be made as the payment gateway does not support the system's currency."), 'successGC' => __('Thank you for your payment. We will request the aforementioned amount within 7 working days. You will receive confirmation of your payment account sign up with us from our GoCardless account shortly.'), 'success1' => __('Your payment has been successfully made to your credit card. A receipt has been emailed to you.'), 'success2' => __('Your payment could not be made to your credit card. Please try an alternative payment method.'), 'success3' => sprintf(__('Your payment has been successfully made to your credit card, but there has been an error recording your payment in %1$s. Please print this screen and contact the school ASAP, quoting code %2$s.'), $_SESSION[$guid]['systemName'], $gibbonFinanceInvoiceID)));
 }
 
 if (!isset($_GET['return'])) { //No return message, so must just be landing to make payment
@@ -82,6 +82,8 @@ if (!isset($_GET['return'])) { //No return message, so must just be landing to m
 
                 $currency = getSettingByScope($connection2, 'System', 'currency');
                 $enablePayments = getSettingByScope($connection2, 'System', 'enablePayments');
+                $paymentGatewaySettings = getSettingByScope($connection2, 'System', 'paymentGatewaySettings');
+
                 $paypalAPIUsername = getSettingByScope($connection2, 'System', 'paypalAPIUsername');
                 $paypalAPIPassword = getSettingByScope($connection2, 'System', 'paypalAPIPassword');
                 $paypalAPISignature = getSettingByScope($connection2, 'System', 'paypalAPISignature');
@@ -89,7 +91,7 @@ if (!isset($_GET['return'])) { //No return message, so must just be landing to m
                 $enableGoCardLess = getSettingByScope($connection2, 'System', 'enableGoCardLess');
                 $GoCardlessAPIkey = getSettingByScope($connection2, 'System', 'GoCardlessAPIkey');
 
-                if ($enablePayments == 'Y' and $paypalAPIUsername != '' and $paypalAPIPassword != '' and $paypalAPISignature != '' and $feeTotal > 0) {
+                if ($enablePayments == 'Y' and $paymentGatewaySettings == 'PayPal' and $paypalAPIUsername != '' and $paypalAPIPassword != '' and $paypalAPISignature != '' and $feeTotal > 0) {
                     $financeOnlinePaymentEnabled = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentEnabled');
                     $financeOnlinePaymentThreshold = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentThreshold');
                     if ($financeOnlinePaymentEnabled == 'Y') {
@@ -122,7 +124,7 @@ if (!isset($_GET['return'])) { //No return message, so must just be landing to m
                         echo '</div>';
                     }
                 }
-                if ($enableGoCardLess == 'Y' and $GoCardlessAPIkey != '' and $feeTotal > 0) {
+                if ($enableGoCardLess == 'Y' and $paymentGatewaySettings == 'GoCardless' and $GoCardlessAPIkey != '' and $feeTotal > 0) {
                    $financeOnlinePaymentEnabled = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentEnabled');
                    $financeOnlinePaymentThreshold = getSettingByScope($connection2, 'Finance', 'financeOnlinePaymentThreshold');
                    if ($financeOnlinePaymentEnabled == 'Y') {
@@ -131,7 +133,7 @@ if (!isset($_GET['return'])) { //No return message, so must just be landing to m
                     echo '</h3>';
                     echo '<p>';
                     if ($financeOnlinePaymentThreshold == '' or $financeOnlinePaymentThreshold >= $feeTotal) {
-                        echo sprintf(__('Payment can be made without credit/debit card, using our secure Go Cardless payment gateway. When you press Pay Online Now, you will be directed to Go Cardless in order to make payment. Once the transaction is complete you will be returned to %1$s.'), $_SESSION[$guid]['systemName']).' ';
+                        echo sprintf(__('Payment can be made with credit/debit card using our secure GoCardless payment gateway. When you press Pay Now, if you have not made a payment to us in the past, you will be directed to GoCardless in order to make payment. Once the transaction is complete you will be returned to %1$s.'), $_SESSION[$guid]['systemName']).' ';
 
                         $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module'].'/invoices_payOnlineProcess.php');
 

@@ -168,7 +168,8 @@ if ($gibbonFinanceInvoiceID == '' or $key == '' or $redirectFlowID == '') {
                         // Init goCardLess
                         $client = new \GoCardlessPro\Client([
                             'access_token' => $GoCardlessAPIKey,
-                            'environment' => \GoCardlessPro\Environment::SANDBOX
+                            // For testing with Sandbox accounts only, please see https://github.com/gocardless/gocardless-pro-php
+                            'environment' => \GoCardlessPro\Environment::LIVE
                             ]);
 
                         // Create redirectflow method
@@ -242,7 +243,7 @@ if ($gibbonFinanceInvoiceID == '' or $key == '' or $redirectFlowID == '') {
                             $todaDate = date("Y-m-d");
                             $getDay = date("d", strtotime($subscriptionStartDate));
                             if(strtotime($subscriptionStartDate) > strtotime($todaDate)){
-                                $subscriptionArray['params']['start_date'] = $subscriptionStartDate;
+                                // $subscriptionArray['params']['start_date'] = $subscriptionStartDate;
                             }
                             if($getDay){
                                 $subscriptionArray['params']['day_of_month'] = $getDay;
@@ -251,7 +252,13 @@ if ($gibbonFinanceInvoiceID == '' or $key == '' or $redirectFlowID == '') {
                             }
 
                             // Create Payment flow subscription
-                            $paymentFlow = $client->subscriptions()->create($subscriptionArray);
+                            
+							try{
+								$paymentFlow = $client->subscriptions()->create($subscriptionArray);
+							}catch (\GoCardlessPro\Core\Exception\ApiException $e) {
+								print_r($e);exit;
+							}
+							
                         }                        
 
                         // Add gibbonGoCardlessCustomers table Payment object

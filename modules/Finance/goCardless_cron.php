@@ -40,7 +40,8 @@ if($resultGibbonGoCardlessCustomers->rowCount() > 0){
         // Init goCardLess
     $client = new \GoCardlessPro\Client([
         'access_token' => $GoCardlessAPIKey,
-        'environment' => \GoCardlessPro\Environment::SANDBOX
+        // For testing with Sandbox accounts only, please see https://github.com/gocardless/gocardless-pro-php
+        'environment' => \GoCardlessPro\Environment::LIVE
         ]);
 
     while ($rowGibbonGoCardlessCustomers = $resultGibbonGoCardlessCustomers->fetch()) {
